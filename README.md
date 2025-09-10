@@ -110,13 +110,3 @@ Agora mensagens enviadas em Alice ↔ Bob aparecem em ambos os terminais.
 
 - `history-<usuario>-<timestamp>.txt` → histórico da sessão salvo automaticamente ao sair com `/exit`.
 
----
-
-## Checklist para demonstração em aula
-
-- Abrir 2 (ou mais) terminais  
-- Iniciar peers com portas diferentes  
-- Conectar com `/connect` ou mostrar descoberta com `/found`  
-- Trocar mensagens (broadcast funcionando)  
-- Mostrar `/peers` e `/history`  
-- Encerrar com `/exit` e mostrar arquivo de histórico salvo  
