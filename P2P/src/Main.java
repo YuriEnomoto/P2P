@@ -1,38 +1,49 @@
 import java.util.Scanner;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
 public class Main {
+    private static boolean yes(String s) {
+        if (s == null) return false;
+        s = s.trim().toLowerCase();
+        return s.equals("s") || s.equals("sim") || s.equals("y") || s.equals("yes");
+    }
+
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
+        try (Scanner scanner = new Scanner(System.in)) {
+            // Nome e porta (sempre definidos pelo usuário)
+            System.out.print("Digite seu nome de usuário: ");
+            String username = scanner.nextLine().trim();
 
-        //Solicitar nome do usuário
-        System.out.println("Digite seu nome de usuário: ");
-        String username = scanner.nextLine();
+            Integer port = null;
+            while (port == null) {
+                System.out.print("Digite a porta: ");
+                String p = scanner.nextLine().trim();
+                try {
+                    port = Integer.parseInt(p);
+                } catch (NumberFormatException e) {
+                    System.out.println("Porta inválida. Tente novamente (ex: 8082).");
+                }
+            }
 
-        //Solicitar a porta
-        System.out.println("Digite a porta: ");
-        int port = scanner.nextInt();
-        scanner.nextLine();
+            Peer peer = new Peer(username, port);
 
-        //Inicializar o peer
-        Peer peer = new Peer(username,port);
-        peer.start();
+            // Pergunta se quer ligar a descoberta (só facilita achar outros peers na mesma LAN)
+            System.out.print("Habilitar descoberta de peers (multicast LAN)? (s/n): ");
+            boolean enableDiscovery = yes(scanner.nextLine());
 
-        //Perguntar se deseja conectar a outro peer
-        System.out.println("Deseja conectar outro peer? s/n: ");
-        String resposta = scanner.nextLine();
+            // Inicia: acceptor TCP + (opcional) descoberta, sem ler teclado ainda
+            peer.start(enableDiscovery, false);
 
-        if(resposta.equalsIgnoreCase("s")){
-            System.out.println("Digite o endereço do peer (host) :  ");
-            String peerHost = scanner.nextLine();
+            System.out.println("\nComandos:");
+            System.out.println("  /connect <host> <port>  - conecta a um peer (ex: /connect localhost 8082)");
+            System.out.println("  /peers                  - lista conexões ativas");
+            System.out.println("  /found                  - lista peers encontrados na LAN (descoberta)");
+            System.out.println("  /history                - mostra histórico da sessão");
+            System.out.println("  /exit                   - encerra com segurança");
+            System.out.println("Digite mensagens para enviar em broadcast...\n");
 
-            System.out.println("Digite a porta do peer (port) :  ");
-            int peerPort = scanner.nextInt();
-            scanner.nextLine();
-
-            peer.connectionPeer(peerHost,peerPort);
+            // Agora começa a ler o teclado
+            peer.startUserInput();
+            // Não fechar scanner para não fechar System.in
         }
-        scanner.close();
     }
 }
